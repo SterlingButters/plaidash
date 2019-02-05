@@ -1,0 +1,5 @@
+include plaidash/plaidash.min.js
+include plaidash/plaidash.dev.js
+include plaidash/metadata.json
+include plaidash/package.json
+include README.md
