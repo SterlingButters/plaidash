@@ -1,27 +1,21 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import PlaidAuthenticator from 'react-native-plaid-link/index.js';
+import PlaidAuthenticator from '../private/PlaidAuthenticator.js'
 
 export default class LoginForm extends Component {
     render() {
-        const {id, data, environment, public_key, products} = this.props;
+        const {id, environment, public_key, products} = this.props;
 
         return (
-            <div id={id}>
                 <PlaidAuthenticator
+                    id={id}
                     onMessage={this.onMessage}
                     publicKey={public_key}
                     env={environment}
                     product={products}
                     clientName="Butters"
                     selectAccount={false}
-                />
-
-                onMessage = (data) => {
-                this.setState({data})
-                }
-            </div>
-        );
+                />);
     }
 }
 
