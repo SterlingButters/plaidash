@@ -18,7 +18,8 @@
   "license": "GPL-3.0",
   "dependencies": {
     "ramda": "^0.25.0",
-    "react-native-plaid-link": "^1.3.7"
+    "react-native-plaid-link": "^1.3.7",
+    "react-plaid-link": "^1.0.3"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

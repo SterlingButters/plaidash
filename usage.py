@@ -10,9 +10,13 @@ app.css.config.serve_locally = True
 
 app.layout = html.Div([
     plaidash.LoginForm(
-        id='input',
-        value='my-value',
-        label='my-label'
+        id='plaid-link',
+        clientName='Butters',
+        env='development',
+        # institution=,
+        publicKey='7a3daf1db208b7d1fe65850572eeb1',
+        # product=,
+        # token=,
     ),
     html.Div(id='output')
 ])

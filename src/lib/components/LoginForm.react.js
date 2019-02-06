@@ -1,21 +1,59 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import PlaidAuthenticator from '../private/PlaidAuthenticator.js'
+import PlaidLink from 'react-plaid-link'
 
 export default class LoginForm extends Component {
-    render() {
-        const {id, environment, public_key, products} = this.props;
+    constructor(props) {
+        super(props);
+        this.state = props
+    }
 
+    handleOnSuccess(token, metadata) {
+        // send token to client server
+        this.props.setProps({token: token})
+    }
+    handleOnExit() {
+        // handle the case when your user exits Link
+    }
+    render() {
+        let id;
+        let clientName;
+        let environment;
+        let publicKey;
+        let token;
+
+        if (this.props.setProps) {
+            id = this.props.id;
+            clientName = this.props.clientName;
+            environment = this.props.env;
+            publicKey = this.props.publicKey;
+            token = this.props.token;
+        } else {
+            id = this.state.id;
+            clientName = this.state.clientName;
+            environment = this.state.env;
+            publicKey = this.state.publicKey;
+            token = this.state.token;
+        }
         return (
-                <PlaidAuthenticator
-                    id={id}
-                    onMessage={this.onMessage}
-                    publicKey={public_key}
+            <div id={id}>
+                <PlaidLink
+                    clientName={clientName}
                     env={environment}
-                    product={products}
-                    clientName="Butters"
-                    selectAccount={false}
-                />);
+                    institution={null}
+                    publicKey={publicKey}
+                    product={["auth", "transactions"]}
+                    token={token}
+                    // webhook="https://webhooks.test.com"
+                    // onEvent={this.handleOnEvent}
+                    onExit={this.handleOnExit}
+                    // onLoad={this.handleOnLoad}
+                    onSuccess={this.handleOnSuccess}>
+                    Open Link and connect your bank!
+                </PlaidLink>
+                <p>Test</p>
+            </div>
+        )
     }
 }
 
@@ -23,33 +61,45 @@ LoginForm.defaultProps = {};
 
 LoginForm.propTypes = {
     /**
-     * The ID used to identify this component in Dash callbacks
+     *
      */
     id: PropTypes.string,
 
     /**
-     * The ID used to identify this component in Dash callbacks
+     *
      */
-    data: PropTypes.string,
+    clientName: PropTypes.string,
 
     /**
      * Dash-assigned callback that should be called whenever any of the
      * properties change
      */
-    setProps: PropTypes.func,
+    env: PropTypes.string.isRequired,
 
     /**
      *
      */
-    environment: PropTypes.string.isRequired,
+    publicKey: PropTypes.string.isRequired,
 
     /**
      *
      */
-    public_key: PropTypes.string.isRequired,
+    product: PropTypes.array.isRequired,
 
     /**
      *
      */
-    products: PropTypes.string
+    onExit: PropTypes.func,
+
+    /**
+     *
+     */
+    onSuccess: PropTypes.func,
+
+    /**
+     *
+     */
+    setProps: PropTypes.func.isRequired,
+
+    token: PropTypes.string
 };
