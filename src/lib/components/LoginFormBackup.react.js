@@ -8,6 +8,7 @@ class LoginForm extends Component {
         super(props);
 
         this.state = {
+            disabledButton: true,
             linkLoaded: false,
             initializeURL: 'https://cdn.plaid.com/link/v2/stable/link-initialize.js',
         };
@@ -16,7 +17,7 @@ class LoginForm extends Component {
         this.onScriptLoaded = this.onScriptLoaded.bind(this);
 
         this.handleLinkOnLoad = this.handleLinkOnLoad.bind(this);
-        this.renderWindow = this.renderWindow.bind(this);
+        this.handleOnClick = this.handleOnClick.bind(this);
     }
 
     onScriptError() {
@@ -39,7 +40,7 @@ class LoginForm extends Component {
             webhook: this.props.webhook,
         });
 
-        console.log("Script loaded");
+        this.setState({ disabledButton: false });
     }
 
     handleLinkOnLoad() {
@@ -49,7 +50,10 @@ class LoginForm extends Component {
         this.setState({ linkLoaded: true });
     }
 
-    renderWindow() {
+    handleOnClick() {
+        if (this.props.onClick !== null) {
+            this.props.onClick();
+        }
         const institution = this.props.institution || null;
         if (window.linkHandler) {
             window.linkHandler.open(institution);
@@ -65,7 +69,13 @@ class LoginForm extends Component {
     render() {
         return (
             <div>
-                {this.renderWindow()}
+                <button
+                    onClick={this.handleOnClick}
+                    disabled={this.state.disabledButton}
+                    style={this.props.style}
+                    className={this.props.className}>
+                    {this.props.children}
+                </button>
                 <Script
                     url={this.state.initializeURL}
                     onError={this.onScriptError}
