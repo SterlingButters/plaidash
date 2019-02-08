@@ -1,31 +1,41 @@
-/* eslint no-magic-numbers: 0 */
-import React, {Component} from 'react';
-
+// /* eslint no-magic-numbers: 0 */
+import React, { Component } from 'react';
 import { LoginForm } from '../lib';
 
 class App extends Component {
-
-    constructor() {
-        super();
-        this.state = {
-            value: ''
-        };
-        this.setProps = this.setProps.bind(this);
+    constructor(props) {
+        super(props);
     }
-
-    setProps(newProps) {
-        this.setState(newProps);
+    handleOnSuccess(token, metadata) {
+        console.log(token);
+        console.log(metadata);
     }
-
+    handleOnExit(error, metadata) {
+        console.log('link: user exited');
+        console.log(error, metadata);
+    }
+    handleOnLoad() {
+        console.log('link: loaded');
+    }
+    handleOnEvent(eventname, metadata) {
+        console.log('link: user event', eventname, metadata);
+    }
     render() {
         return (
-            <div>
-                <LoginForm
-                    setProps={this.setProps}
-                    {...this.state}
-                />
-            </div>
-        )
+            <LoginForm
+                clientName="Plaid Client"
+                env="sandbox"
+                product={['auth', 'transactions']}
+                publicKey="7a3daf1db208b7d1fe65850572eeb1"
+                className="some-class-name"
+                apiVersion="v2"
+                onSuccess={this.handleOnSuccess}
+                onExit={this.handleOnExit}
+                onEvent={this.handleOnEvent}
+                onLoad={this.handleOnLoad}>
+                Open Plaid Link button
+            </LoginForm>
+        );
     }
 }
 
