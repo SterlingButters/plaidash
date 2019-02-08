@@ -16,11 +16,13 @@ class LoginForm extends Component {
 
         this.onScriptError = this.onScriptError.bind(this);
         this.onScriptLoaded = this.onScriptLoaded.bind(this);
+        this.onScriptSuccess = this.onScriptSuccess.bind(this);
+
         this.handleLinkOnLoad = this.handleLinkOnLoad.bind(this);
         this.handleOnClick = this.handleOnClick.bind(this);
     }
 
-    static onScriptError() {
+    onScriptError() {
         console.error('There was an issue loading the link-initialize.js script');
     }
 
@@ -29,11 +31,11 @@ class LoginForm extends Component {
             apiVersion: this.props.apiVersion,
             clientName: this.props.clientName,
             env: this.props.env,
-            key: this.props.publicKey,
+            key: this.props.key,
             onExit: this.props.onExit,
             onLoad: this.handleLinkOnLoad,
             onEvent: this.props.onEvent,
-            onSuccess: this.props.onSuccess,
+            onSuccess: this.onScriptSuccess,
             product: this.props.product,
             selectAccount: this.props.selectAccount,
             token: this.props.token,
@@ -41,6 +43,10 @@ class LoginForm extends Component {
         });
 
         this.setState({ disabledButton: false });
+    }
+
+    onScriptSuccess() {
+        console.log('Script Run Successfully');
     }
 
     handleLinkOnLoad() {
@@ -79,7 +85,10 @@ class LoginForm extends Component {
                 <Script
                     url={this.state.initializeURL}
                     onError={this.onScriptError}
-                    onLoad={this.onScriptLoaded} />
+                    onLoad={this.onScriptLoaded}
+                    onSuccess={this.onScriptSuccess} // Added
+                />
+                <p>{this.props.token}</p>
             </div>
         );
     }
@@ -88,9 +97,14 @@ class LoginForm extends Component {
 LoginForm.defaultProps = {
     apiVersion: 'v2',
     env: 'sandbox',
+    clientName: 'Test',
+    key: '7a3daf1db208b7d1fe65850572eeb1',
     institution: null,
+    product: ['transactions', 'assets'],
     selectAccount: false,
     token: null,
+    onLoad: null,
+    onClick: null,
     style: {
         padding: '6px 4px',
         outline: 'none',
@@ -116,7 +130,7 @@ LoginForm.propTypes = {
 
     // The public_key associated with your account; available from
     // the Plaid dashboard (https://dashboard.plaid.com)
-    publicKey: PropTypes.string.isRequired,
+    key: PropTypes.string.isRequired,
 
     // The Plaid products you wish to use, an array containing some of connect,
     // auth, identity, income, transactions, assets
@@ -147,7 +161,7 @@ LoginForm.propTypes = {
     // A function that is called when a user has successfully onboarded their
     // account. The function should expect two arguments, the public_key and a
     // metadata object
-    onSuccess: PropTypes.func.isRequired,
+    onSuccess: PropTypes.func,
 
     // A function that is called when a user has specifically exited Link flow
     onExit: PropTypes.func,

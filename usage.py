@@ -14,7 +14,7 @@ app.layout = html.Div([
         clientName='Butters',
         env='development',
         # institution=,
-        publicKey='7a3daf1db208b7d1fe65850572****',
+        publicKey='7a3daf1db208b7d1fe65850572eeb1',
         # product=,
         # token=,
     ),
