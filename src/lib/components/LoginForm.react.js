@@ -16,6 +16,11 @@ class LoginForm extends Component {
         this.onScriptLoaded = this.onScriptLoaded.bind(this);
 
         this.handleLinkOnLoad = this.handleLinkOnLoad.bind(this);
+
+        this.handleOnExit = this.handleOnExit.bind(this);
+        this.handleOnEvent = this.handleOnEvent.bind(this);
+        this.handleOnSuccess = this.handleOnSuccess.bind(this);
+
         this.renderWindow = this.renderWindow.bind(this);
     }
 
@@ -29,10 +34,10 @@ class LoginForm extends Component {
             clientName: this.props.clientName,
             env: this.props.env,
             key: this.props.publicKey,
-            onExit: this.props.onExit,
+            onExit: this.handleOnExit,
             onLoad: this.handleLinkOnLoad,
-            onEvent: this.props.onEvent,
-            onSuccess: this.props.onSuccess,
+            onEvent: this.handleOnEvent,
+            onSuccess: this.handleOnSuccess,
             product: this.props.product,
             selectAccount: this.props.selectAccount,
             token: this.props.token,
@@ -43,10 +48,22 @@ class LoginForm extends Component {
     }
 
     handleLinkOnLoad() {
-        if (this.props.onLoad !== null) {
-            this.props.onLoad();
-        }
+        console.log("loaded");
         this.setState({ linkLoaded: true });
+    }
+    handleOnSuccess(token, metadata) {
+        console.log(token);
+        console.log(metadata);
+    }
+    handleOnExit(error, metadata) {
+        console.log('link: user exited');
+        console.log(error, metadata);
+    }
+    handleOnLoad() {
+        console.log('link: loaded');
+    }
+    handleOnEvent(eventname, metadata) {
+        console.log('link: user event', eventname, metadata);
     }
 
     renderWindow() {
@@ -152,10 +169,6 @@ LoginForm.propTypes = {
     // Calls to plaidLinkHandler.open() prior to the onLoad callback will be
     // delayed until the module is fully loaded.
     onLoad: PropTypes.func,
-
-    //
-    //
-    onClick: PropTypes.func,
 
     // A function that is called during a user's flow in Link.
     // See
