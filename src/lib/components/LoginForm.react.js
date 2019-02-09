@@ -54,6 +54,7 @@ class LoginForm extends Component {
     handleOnSuccess(token, metadata) {
         console.log(token);
         console.log(metadata);
+        this.props.onTokenUpdate(token);
     }
     handleOnExit(error, metadata) {
         console.log('link: user exited');
@@ -111,6 +112,8 @@ LoginForm.propTypes = {
     // id
     id: PropTypes.string,
 
+    data: PropTypes.node,
+
     // ApiVersion flag to use new version of Plaid API
     apiVersion: PropTypes.string,
 
@@ -148,6 +151,7 @@ LoginForm.propTypes = {
     // This will cause Link to open directly to the authentication step for
     // that user's institution.
     token: PropTypes.string,
+    access_token: PropTypes.string,
 
     // Set to true to launch Link with the 'Select Account' pane enabled.
     // Allows users to select an individual account once they've authenticated
@@ -172,6 +176,9 @@ LoginForm.propTypes = {
     // A function that is called during a user's flow in Link.
     // See
     onEvent: PropTypes.func,
+
+
+    onTokenUpdate: PropTypes.func,
 
     // Button Styles as an Object
     style: PropTypes.object,

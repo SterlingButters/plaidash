@@ -6,8 +6,14 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            token: null
-        }
+            access_token: null
+        };
+
+        this.handleUpdateToken = this.handleUpdateToken.bind(this)
+    }
+
+    handleUpdateToken(access_token) {
+        this.setState({ access_token: access_token });
     }
 
     render() {
@@ -20,7 +26,8 @@ class App extends Component {
                 publicKey="7a3daf1db208b7d1fe65850572eeb1"
                 className="some-class-name"
                 apiVersion="v2"
-                token={this.state.token}
+                onTokenUpdate={this.handleUpdateToken}
+                token={this.state.access_token}
             >
             </LoginForm>
         );

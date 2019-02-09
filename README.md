@@ -1,41 +1,8 @@
-# Plaid Dash Components
+#Plaidash LoginForm
+The purpose of this project is to create a dash component for the plaid link for easy rendering and use 
+with the python API once an `access_token` is retrieved
 
-Plaid Dash Components is a Dash component library.
-
-Get started with:
-1. Install Dash and its dependencies: https://dash.plot.ly/installation
-2. Run `python usage.py`
-3. Visit http://localhost:8050 in your web browser
-
-## Contributing
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md)
-
-### Install dependencies
-
-If you have selected install_dependencies during the prompt, you can skip this part.
-
-1. Install npm packages
-    ```
-    $ npm install
-    ```
-2. Create a virtual env and activate.
-    ```
-    $ virtualenv venv
-    $ . venv/bin/activate
-    ```
-    _Note: venv\Scripts\activate for windows_
-
-3. Install python packages required to build components.
-    ```
-    $ pip install -r requirements.txt
-    ```
-4. Install the python packages for testing (optional)
-    ```
-    $ pip install -r tests/requirements.txt
-    ```
-
-### Write your component code in `src/lib/components/LoginForm.react.js`. 
+### Component written in `src/lib/components/LoginForm.react.js`. 
 
 - The demo app is in `src/demo` and you will import your example component code into your demo app.
 - Test your code in a Python environment:
