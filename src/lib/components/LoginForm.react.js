@@ -64,7 +64,7 @@ class LoginForm extends Component {
 
     render() {
         return (
-            <div>
+            <div id={this.props.id}>
                 {this.renderWindow()}
                 <Script
                     url={this.state.initializeURL}
@@ -92,6 +92,9 @@ LoginForm.defaultProps = {
 };
 
 LoginForm.propTypes = {
+    // id
+    id: PropTypes.string,
+
     // ApiVersion flag to use new version of Plaid API
     apiVersion: PropTypes.string,
 
@@ -113,8 +116,10 @@ LoginForm.propTypes = {
     // auth, identity, income, transactions, assets
     product: PropTypes.arrayOf(
         PropTypes.oneOf([
-            'connect',  // legacy product name
-            'info',     // legacy product name
+            // legacy product names
+            'connect',
+            'info',
+            // normal product names
             'auth',
             'identity',
             'income',
@@ -138,7 +143,7 @@ LoginForm.propTypes = {
     // A function that is called when a user has successfully onboarded their
     // account. The function should expect two arguments, the public_key and a
     // metadata object
-    onSuccess: PropTypes.func.isRequired,
+    onSuccess: PropTypes.func,
 
     // A function that is called when a user has specifically exited Link flow
     onExit: PropTypes.func,

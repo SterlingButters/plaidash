@@ -19,7 +19,8 @@
   "dependencies": {
     "ramda": "^0.25.0",
     "react-native-plaid-link": "^1.3.7",
-    "react-plaid-link": "^1.0.3"
+    "react-plaid-link": "^1.0.3",
+    "terser": "^3.14.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

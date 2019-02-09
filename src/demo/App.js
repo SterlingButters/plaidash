@@ -23,6 +23,7 @@ class App extends Component {
     render() {
         return (
             <LoginForm
+                id="Test"
                 clientName="Plaid Client"
                 env="sandbox"
                 product={['auth', 'transactions']}
@@ -33,7 +34,6 @@ class App extends Component {
                 onExit={this.handleOnExit}
                 onEvent={this.handleOnEvent}
                 onLoad={this.handleOnLoad}>
-                Open Plaid Link button
             </LoginForm>
         );
     }

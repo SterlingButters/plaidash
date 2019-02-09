@@ -13,17 +13,17 @@ app.layout = html.Div([
         id='plaid-link',
         clientName='Butters',
         env='development',
-        # institution=,
         publicKey='7a3daf1db208b7d1fe65850572eeb1',
-        # product=,
-        # token=,
+        product=['auth', 'transactions'],
     ),
-    html.Div(id='output')
+    html.Div(id='display-token')
 ])
 
-@app.callback(Output('output', 'children'), [Input('input', 'value')])
-def display_output(value):
-    return 'You have entered {}'.format(value)
+
+@app.callback(Output('display-token', 'children'),
+             [Input('plaid-link', 'token'),])
+def display_output(token):
+    return html.P('Token: {}'.format(token))
 
 
 if __name__ == '__main__':
