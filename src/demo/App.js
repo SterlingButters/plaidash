@@ -5,6 +5,9 @@ import { LoginForm } from '../lib';
 class App extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            token: null
+        }
     }
 
     render() {
@@ -16,7 +19,9 @@ class App extends Component {
                 product={['auth', 'transactions']}
                 publicKey="7a3daf1db208b7d1fe65850572eeb1"
                 className="some-class-name"
-                apiVersion="v2">
+                apiVersion="v2"
+                token={this.state.token}
+            >
             </LoginForm>
         );
     }

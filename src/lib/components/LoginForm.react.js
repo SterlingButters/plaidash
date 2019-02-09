@@ -98,7 +98,6 @@ LoginForm.defaultProps = {
     env: 'sandbox',
     institution: null,
     selectAccount: false,
-    onClick: null,
     style: {
         padding: '6px 4px',
         outline: 'none',
@@ -179,11 +178,6 @@ LoginForm.propTypes = {
 
     // Button Class names as a String
     className: PropTypes.string,
-
-    children: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.node),
-        PropTypes.node
-    ])
 };
 
 export default LoginForm;

@@ -11,8 +11,8 @@ app.css.config.serve_locally = True
 app.layout = html.Div([
     plaidash.LoginForm(
         id='plaid-link',
-        clientName='Btters',
-        env='development',
+        clientName='Butters',
+        env='sandbox',
         publicKey='7a3daf1db208b7d1fe65850572eeb1',
         product=['auth', 'transactions'],
     ),
@@ -23,6 +23,7 @@ app.layout = html.Div([
 @app.callback(Output('display-token', 'children'),
              [Input('plaid-link', 'token'),])
 def display_output(token):
+    print(token)
     return html.P('Token: {}'.format(token))
 
 
