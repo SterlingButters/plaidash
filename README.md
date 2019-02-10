@@ -2,7 +2,7 @@
 The purpose of this project is to create a dash component for the plaid link for easy rendering and use 
 with python once an `access_token` is retrieved.
 
-
+![alt text](https://github.com/SterlingButters/plaidash/blob/master/PlaidDemo.gif)
 
 ### Component written in 
 `src/lib/components/LoginForm.react.js`. 
