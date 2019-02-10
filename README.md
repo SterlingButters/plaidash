@@ -1,8 +1,11 @@
-#Plaidash LoginForm
+# Plaidash LoginForm
 The purpose of this project is to create a dash component for the plaid link for easy rendering and use 
 with the python API once an `access_token` is retrieved
 
 ### Component written in `src/lib/components/LoginForm.react.js`. 
+
+### Acknowledgements
+A special thanks to ![@tcbegley](https://community.plot.ly/u/tcbegley)
 
 - The demo app is in `src/demo` and you will import your example component code into your demo app.
 - Test your code in a Python environment:
