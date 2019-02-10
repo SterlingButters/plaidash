@@ -1,12 +1,17 @@
 # Plaidash LoginForm
 The purpose of this project is to create a dash component for the plaid link for easy rendering and use 
-with the python API once an `access_token` is retrieved
+with python once an `access_token` is retrieved.
 
-### Component written in `src/lib/components/LoginForm.react.js`. 
+
+
+### Component written in 
+`src/lib/components/LoginForm.react.js`. 
 
 ### Acknowledgements
 A special thanks to [@tcbegley](https://community.plot.ly/u/tcbegley)
 
+
+# TODO:
 - The demo app is in `src/demo` and you will import your example component code into your demo app.
 - Test your code in a Python environment:
     1. Build your code
@@ -17,6 +22,66 @@ A special thanks to [@tcbegley](https://community.plot.ly/u/tcbegley)
         ```
         $ python usage.py
         ```
+        
+##### Sample Usage:
+
+    from dash.dependencies import Input, Output
+    import dash_html_components as html
+    import dash
+    import plaid
+    import plaidash
+    import datetime
+    from flask import jsonify
+    
+    app = dash.Dash(__name__)
+    app.config['suppress_callback_exceptions'] = True
+    
+    app.layout = html.Div([
+        html.Div(id='login-container'),
+        html.Div(id='display-transactions'),
+        html.Button('Open Plaid', id='open-form-button'),
+    
+        plaidash.LoginForm(
+                id='plaid-link',
+                clientName='Butters',
+                env='sandbox',
+                publicKey='7a3daf1db208b7d1fe65850572eeb1',
+                product=['auth', 'transactions'],
+            ),
+    ])
+    
+    @app.callback(Output('login-container', 'children'),
+                  [Input('open-form-button', 'n_clicks'),])
+    def display_output(clicks):
+        if clicks is not None and clicks > 0:
+            return plaidash.LoginForm(
+                id='plaid-link',
+                clientName='Butters',
+                env='sandbox',
+                publicKey='7a3daf1db208b7d1fe65850572eeb1',
+                product=['auth', 'transactions'],
+            ),
+   
+   
+    @app.callback(Output('display-transactions', 'children'),
+                 [Input('plaid-link', 'access_token'),])
+    def display_output(token):
+        print(token)
+   
+        start_date = '{:%Y-%m-%d}'.format(datetime.datetime.now() + datetime.timedelta(-30))
+        end_date = '{:%Y-%m-%d}'.format(datetime.datetime.now())
+        try:
+            transactions_response = plaid.client.Transactions.get(access_token=token, start_date=start_date, end_date=end_date)
+        except plaid.errors.PlaidError as e:
+            return jsonify(format_error(e))
+   
+        pretty_print_response(transactions_response)
+        return html.P(jsonify({'error': None, 'transactions': transactions_response}))
+    
+    
+    if __name__ == '__main__':
+        app.run_server(debug=True)
+
 - Write tests for your component.
     - A sample test is available in `tests/test_usage.py`, it will load `usage.py` and you can then automate interactions with selenium.
     - Run the tests with `$ pytest tests`.
@@ -57,8 +122,3 @@ A special thanks to [@tcbegley](https://community.plot.ly/u/tcbegley)
         $ npm publish
         ```
         _Publishing your component to NPM will make the JavaScript bundles available on the unpkg CDN. By default, Dash servers the component library's CSS and JS from the remote unpkg CDN, so if you haven't published the component package to NPM you'll need to set the `serve_locally` flags to `True` (unless you choose `False` on `publish_on_npm`). We will eventually make `serve_locally=True` the default, [follow our progress in this issue](https://github.com/plotly/dash/issues/284)._
-5. Share your component with the community! https://community.plot.ly/c/dash
-    1. Publish this repository to GitHub
-    2. Tag your GitHub repository with the plotly-dash tag so that it appears here: https://github.com/topics/plotly-dash
-    3. Create a post in the Dash community forum: https://community.plot.ly/c/dash
-
