@@ -10,7 +10,7 @@ class LoginForm extends Component {
 
         this.state = {
             // here
-            data: this.props.data,
+            savedToken: this.props.savedToken,
 
             linkLoaded: false,
             initializeURL: 'https://cdn.plaid.com/link/v2/stable/link-initialize.js',
@@ -52,27 +52,26 @@ class LoginForm extends Component {
     }
 
     handleLinkOnLoad() {
-        console.log("loaded");
+        console.log("Loaded");
         this.setState({ linkLoaded: true });
     }
     // //////////////////////////////////
     handleOnSuccess(token, metadata) {
         console.log(token);
         console.log(metadata);
-        // this.props.onTokenUpdate(token);
-        this.updateData()
+        this.transmitToken(token)
     }
     componentWillReceiveProps(nextProps){
-        console.log("props recived");
-        this.setState({data: nextProps.data});
+        console.log("props received");
+        this.setState({savedToken: nextProps.savedToken});
     }
-    updateData() {
-        let elm = ReactDOM.findDOMNode(this);
-        // input value
-        const dataToParent = elm.children.value;
-        console.log(dataToParent);
-        this.props.updateMyData(dataToParent,(newData) => {
-            this.setState({data:newData});
+    transmitToken(token) {
+        // get current value of token property to send to parent
+        const dataToParent = token;
+        console.log("Data Sent To Parent: ", dataToParent);
+        // data=<value-of-token-property> func=(newData) => ...
+        this.props.updateToken(dataToParent,(newToken) => {
+            this.setState({savedToken: newToken});
         })
     };
     // //////////////////////////////////
@@ -133,7 +132,7 @@ LoginForm.propTypes = {
     // id
     id: PropTypes.string,
 
-    data: PropTypes.node,
+    savedToken: PropTypes.string,
 
     // ApiVersion flag to use new version of Plaid API
     apiVersion: PropTypes.string,
@@ -172,7 +171,6 @@ LoginForm.propTypes = {
     // This will cause Link to open directly to the authentication step for
     // that user's institution.
     token: PropTypes.string,
-    access_token: PropTypes.string,
 
     // Set to true to launch Link with the 'Select Account' pane enabled.
     // Allows users to select an individual account once they've authenticated

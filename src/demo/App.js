@@ -8,18 +8,20 @@ class App extends Component {
         this.state = {
 
         };
-        let access_token = null;
     }
 
     changeChild(data, func) {
         let changedData = data;
         // change data in here
-        if (data === '') {
-            changedData = "Empty String";
+        if (data === null || undefined) {
+            changedData = "Empty";
         }
+        console.log("Data Received By Parent:", changedData);
+
         // parent storing data for him
-        this.childData = changedData;
-        // send it back to the child
+        // was "this.childData"
+        // this.props.childData = changedData;
+        // set data state in child via passed function
         func(changedData);
     };
 
@@ -35,7 +37,7 @@ class App extends Component {
                 className="some-class-name"
                 apiVersion="v2"
                 updateToken={this.changeChild}
-                token={this.state.childData}
+                savedToken={this.state.savedToken}
             >
             </LoginForm>
         );
