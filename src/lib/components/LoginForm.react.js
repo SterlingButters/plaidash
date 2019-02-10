@@ -43,8 +43,6 @@ class LoginForm extends Component {
             token: this.props.token,
             webhook: this.props.webhook,
         });
-
-        console.log("Script loaded");
     }
 
     handleLinkOnLoad() {
@@ -57,20 +55,26 @@ class LoginForm extends Component {
         this.props.onTokenUpdate(token);
     }
     handleOnExit(error, metadata) {
-        console.log('link: user exited');
+        console.log('PlaidLink: user exited');
         console.log(error, metadata);
     }
     handleOnLoad() {
-        console.log('link: loaded');
+        console.log('PlaidLink: loaded');
     }
     handleOnEvent(eventname, metadata) {
-        console.log('link: user event', eventname, metadata);
+        console.log('PlaidLink: user event', eventname, metadata);
     }
 
     renderWindow() {
         const institution = this.props.institution || null;
         if (window.linkHandler) {
             window.linkHandler.open(institution);
+        }
+    }
+
+    chooseRender() {
+        if (this.props.access_token === null) {
+            this.renderWindow()
         }
     }
 
@@ -82,8 +86,9 @@ class LoginForm extends Component {
 
     render() {
         return (
-            <div id={this.props.id}>
-                {this.renderWindow()}
+            <div id={this.props.id}
+                 access_token={this.props.access_token}>
+                {this.chooseRender()}
                 <Script
                     url={this.state.initializeURL}
                     onError={this.onScriptError}
@@ -111,8 +116,6 @@ LoginForm.defaultProps = {
 LoginForm.propTypes = {
     // id
     id: PropTypes.string,
-
-    data: PropTypes.node,
 
     // ApiVersion flag to use new version of Plaid API
     apiVersion: PropTypes.string,
@@ -151,6 +154,8 @@ LoginForm.propTypes = {
     // This will cause Link to open directly to the authentication step for
     // that user's institution.
     token: PropTypes.string,
+
+
     access_token: PropTypes.string,
 
     // Set to true to launch Link with the 'Select Account' pane enabled.

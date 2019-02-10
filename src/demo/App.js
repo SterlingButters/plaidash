@@ -8,7 +8,6 @@ class App extends Component {
         this.state = {
             access_token: null
         };
-
         this.handleUpdateToken = this.handleUpdateToken.bind(this)
     }
 
@@ -20,6 +19,8 @@ class App extends Component {
         return (
             <LoginForm
                 id="Test"
+                access_token={this.state.access_token}
+
                 clientName="Plaid Client"
                 env="sandbox"
                 product={['auth', 'transactions']}
@@ -27,7 +28,6 @@ class App extends Component {
                 className="some-class-name"
                 apiVersion="v2"
                 onTokenUpdate={this.handleUpdateToken}
-                token={this.state.access_token}
             >
             </LoginForm>
         );
