@@ -6,17 +6,25 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            access_token: null
+
         };
-
-        this.handleUpdateToken = this.handleUpdateToken.bind(this)
+        let access_token = null;
     }
 
-    handleUpdateToken(access_token) {
-        this.setState({ access_token: access_token });
-    }
+    changeChild(data, func) {
+        let changedData = data;
+        // change data in here
+        if (data === '') {
+            changedData = "Empty String";
+        }
+        // parent storing data for him
+        this.childData = changedData;
+        // send it back to the child
+        func(changedData);
+    };
 
     render() {
+        console.log("LoginForm Rendered");
         return (
             <LoginForm
                 id="Test"
@@ -26,8 +34,8 @@ class App extends Component {
                 publicKey="7a3daf1db208b7d1fe65850572eeb1"
                 className="some-class-name"
                 apiVersion="v2"
-                onTokenUpdate={this.handleUpdateToken}
-                token={this.state.access_token}
+                updateToken={this.changeChild}
+                token={this.state.childData}
             >
             </LoginForm>
         );

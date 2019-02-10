@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Script from 'react-load-script';
 import PropTypes from 'prop-types';
+import ReactDOM from 'react-dom';
 
 
 class LoginForm extends Component {
@@ -8,6 +9,9 @@ class LoginForm extends Component {
         super(props);
 
         this.state = {
+            // here
+            data: this.props.data,
+
             linkLoaded: false,
             initializeURL: 'https://cdn.plaid.com/link/v2/stable/link-initialize.js',
         };
@@ -51,11 +55,28 @@ class LoginForm extends Component {
         console.log("loaded");
         this.setState({ linkLoaded: true });
     }
+    // //////////////////////////////////
     handleOnSuccess(token, metadata) {
         console.log(token);
         console.log(metadata);
-        this.props.onTokenUpdate(token);
+        // this.props.onTokenUpdate(token);
+        this.updateData()
     }
+    componentWillReceiveProps(nextProps){
+        console.log("props recived");
+        this.setState({data: nextProps.data});
+    }
+    updateData() {
+        let elm = ReactDOM.findDOMNode(this);
+        // input value
+        const dataToParent = elm.children.value;
+        console.log(dataToParent);
+        this.props.updateMyData(dataToParent,(newData) => {
+            this.setState({data:newData});
+        })
+    };
+    // //////////////////////////////////
+
     handleOnExit(error, metadata) {
         console.log('link: user exited');
         console.log(error, metadata);
