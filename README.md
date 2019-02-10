@@ -5,7 +5,7 @@ with the python API once an `access_token` is retrieved
 ### Component written in `src/lib/components/LoginForm.react.js`. 
 
 ### Acknowledgements
-A special thanks to ![@tcbegley](https://community.plot.ly/u/tcbegley)
+A special thanks to [@tcbegley](https://community.plot.ly/u/tcbegley)
 
 - The demo app is in `src/demo` and you will import your example component code into your demo app.
 - Test your code in a Python environment:
