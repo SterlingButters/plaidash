@@ -2,6 +2,7 @@
 from dash.dependencies import Input, Output
 import dash_html_components as html
 import dash
+import json
 import plaid
 import plaidash
 import datetime
@@ -51,6 +52,14 @@ app.layout = html.Div([
 #
 #     pretty_print_response(transactions_response)
 #     return html.P(jsonify({'error': None, 'transactions': transactions_response}))
+
+
+def pretty_print_response(response):
+    print(json.dumps(response, indent=2, sort_keys=True))
+
+
+def format_error(e):
+    return {'error': {'display_message': e.display_message, 'error_code': e.code, 'error_type': e.type, 'error_message': e.message } }
 
 
 if __name__ == '__main__':
