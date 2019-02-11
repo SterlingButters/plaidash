@@ -17,9 +17,9 @@ app.layout = html.Div([
     html.Button('Open Plaid', id='open-form-button'),
 ])
 
-PLAID_CLIENT_ID = '5c4a2ad8d8717a0010e5176c'
-PLAID_SECRET = '740664395d8cb7b64490c19a452a26'
-PLAID_PUBLIC_KEY = '7a3daf1db208b7d1fe65850572eeb1'
+PLAID_CLIENT_ID = ''
+PLAID_SECRET = ''
+PLAID_PUBLIC_KEY = ''
 PLAID_ENV = os.getenv('PLAID_ENV', 'sandbox')
 PLAID_PRODUCTS = os.getenv('PLAID_PRODUCTS', ['auth', 'transactions'])
 
