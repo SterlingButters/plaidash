@@ -1,5 +1,5 @@
 # https://plaid.com/docs/#exchange-token-flow
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import dash_html_components as html
 import dash
 import json
@@ -14,12 +14,11 @@ app.config['suppress_callback_exceptions'] = True
 
 app.layout = html.Div([
     html.Div(id='login-container'),
-    # html.Div(id='display-transactions'),
     html.Button('Open Plaid', id='open-form-button'),
 ])
 
 PLAID_CLIENT_ID = '5c4a2ad8d8717a0010e5176c'
-PLAID_SECRET = 'eace7effe6c8b7523a37fe5bb993e9'
+PLAID_SECRET = '740664395d8cb7b64490c19a452a26'
 PLAID_PUBLIC_KEY = '7a3daf1db208b7d1fe65850572eeb1'
 PLAID_ENV = os.getenv('PLAID_ENV', 'sandbox')
 PLAID_PRODUCTS = os.getenv('PLAID_PRODUCTS', ['auth', 'transactions'])
@@ -35,7 +34,8 @@ client = plaid.Client(client_id=PLAID_CLIENT_ID,
               [Input('open-form-button', 'n_clicks'),])
 def display_output(clicks):
     if clicks is not None and clicks > 0:
-        return plaidash.LoginForm(
+        return html.Div([
+            plaidash.LoginForm(
             id='plaid-link',
             clientName='Butters',
             env=PLAID_ENV,
@@ -43,30 +43,40 @@ def display_output(clicks):
             product=PLAID_PRODUCTS,
             # institution=
         ),
+            html.Button('Load Transactions', id='load-button'),
+            html.Div(id='display-transactions'),
+        ])
 
 
 @app.callback(Output('display-transactions', 'children'),
-             [Input('plaid-link', 'access_token')])
-def display_output(token):
-    print(token)
+             [Input('load-button', 'n_clicks')],
+             [State('plaid-link', 'access_token')])
+def display_output(clicks, token):
+    if clicks is not None and clicks > 0:
+        print(token)
+        response = client.Item.public_token.exchange(token)
+        access_token = response['access_token']
+        print(access_token)
 
-    start_date = '{:%Y-%m-%d}'.format(datetime.datetime.now() + datetime.timedelta(-30))
-    end_date = '{:%Y-%m-%d}'.format(datetime.datetime.now())
-    try:
-        transactions_response = client.Transactions.get(access_token=token, start_date=start_date, end_date=end_date)
-    except plaid.errors.PlaidError as e:
-        return jsonify(format_error(e))
+        start_date = '{:%Y-%m-%d}'.format(datetime.datetime.now() + datetime.timedelta(-30))
+        end_date = '{:%Y-%m-%d}'.format(datetime.datetime.now())
+        try:
+            transactions_response = client.Transactions.get(access_token=access_token, start_date=start_date, end_date=end_date)
+        except plaid.errors.PlaidError as e:
+            # return html.P(jsonify(format_error(e)))
+            return html.P('There was an error')
 
-    pretty_print_response(transactions_response)
-    return html.P(jsonify({'error': None, 'transactions': transactions_response}))
+        print(pretty_response(transactions_response))
+        # return html.P(str(jsonify({'error': None, 'transactions': transactions_response})))
+        return html.P(pretty_response(transactions_response))
 
 
-def pretty_print_response(response):
-    print(json.dumps(response, indent=2, sort_keys=True))
+def pretty_response(response):
+    return json.dumps(response, indent=2, sort_keys=True)
 
 
 def format_error(e):
-    return {'error': {'display_message': e.display_message, 'error_code': e.code, 'error_type': e.type, 'error_message': e.message } }
+    return {'error': {'display_message': e.display_message, 'error_code': e.code, 'error_type': e.type,}} # 'error_message': e.message } }
 
 
 if __name__ == '__main__':

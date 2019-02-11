@@ -21,13 +21,6 @@ class App extends Component {
             <LoginForm
                 setProps={this.setProps}
                 {...this.state}
-
-                // id="Test"
-                // clientName="Plaid Client"
-                // env="sandbox"
-                // product={['auth', 'transactions']}
-                // publicKey="7a3daf1db208b7d1fe65850572eeb1"
-                // apiVersion="v2"
             >
             </LoginForm>
         );

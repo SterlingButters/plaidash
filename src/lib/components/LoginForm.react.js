@@ -54,7 +54,6 @@ class LoginForm extends Component {
     handleOnSuccess(token, metadata) {
         console.log(token);
         console.log(metadata);
-
         this.props.setProps({access_token: token})
     }
     handleOnExit(error, metadata) {
@@ -90,7 +89,6 @@ class LoginForm extends Component {
 
 LoginForm.defaultProps = {
     apiVersion: 'v2',
-    env: 'sandbox',
     institution: null,
     selectAccount: false,
 };
