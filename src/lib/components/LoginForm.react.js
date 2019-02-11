@@ -155,7 +155,8 @@ LoginForm.propTypes = {
     // that user's institution.
     token: PropTypes.string,
 
-
+    // This is the token that will be returned for use in Dash. Can also be
+    // understood as the "output" of this component
     access_token: PropTypes.string,
 
     // Set to true to launch Link with the 'Select Account' pane enabled.
@@ -182,14 +183,8 @@ LoginForm.propTypes = {
     // See
     onEvent: PropTypes.func,
 
-
+    // Function that is run when the token is updated
     onTokenUpdate: PropTypes.func,
-
-    // Button Styles as an Object
-    style: PropTypes.object,
-
-    // Button Class names as a String
-    className: PropTypes.string,
 };
 
 export default LoginForm;
