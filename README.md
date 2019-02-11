@@ -8,7 +8,10 @@ with python once an `access_token` is retrieved.
 `src/lib/components/LoginForm.react.js`. 
 
 ### Acknowledgements
-A special thanks to [@tcbegley](https://community.plot.ly/u/tcbegley)
+A special thanks to:
+ [@tcbegley](https://community.plot.ly/u/tcbegley)
+ [@pbernasconi](https://github.com/pbernasconi/react-plaid-link)
+
 
 
 # TODO:
@@ -40,14 +43,6 @@ A special thanks to [@tcbegley](https://community.plot.ly/u/tcbegley)
         html.Div(id='login-container'),
         html.Div(id='display-transactions'),
         html.Button('Open Plaid', id='open-form-button'),
-    
-        plaidash.LoginForm(
-                id='plaid-link',
-                clientName='Butters',
-                env='sandbox',
-                publicKey='7a3daf1db208b7d1fe65850572eeb1',
-                product=['auth', 'transactions'],
-            ),
     ])
     
     @app.callback(Output('login-container', 'children'),
