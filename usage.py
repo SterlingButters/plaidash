@@ -17,11 +17,19 @@ app.layout = html.Div([
     html.Button('Open Plaid', id='open-form-button'),
 ])
 
-PLAID_CLIENT_ID = ''
-PLAID_SECRET = ''
-PLAID_PUBLIC_KEY = ''
-PLAID_ENV = os.getenv('PLAID_ENV', 'sandbox')
-PLAID_PRODUCTS = os.getenv('PLAID_PRODUCTS', ['auth', 'transactions'])
+with open('/Users/sterlingbutters/.plaid/.credentials.json') as CREDENTIALS:
+    KEYS = json.load(CREDENTIALS)
+    print(json.dumps(KEYS, indent=2))
+
+    PLAID_CLIENT_ID = KEYS['client_id']
+    PLAID_PUBLIC_KEY = KEYS['public_key']
+    ENV = 'sandbox'
+    if ENV == 'sandbox':
+        PLAID_SECRET = KEYS['sandbox_secret']
+    if ENV == 'dvelopment':
+        PLAID_SECRET = KEYS['development_secret']
+    PLAID_ENV = os.getenv('PLAID_ENV', ENV)
+    PLAID_PRODUCTS = os.getenv('PLAID_PRODUCTS', ['auth', 'transactions'])
 
 client = plaid.Client(client_id=PLAID_CLIENT_ID,
                       secret=PLAID_SECRET,
