@@ -6,38 +6,27 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            access_token: null
         };
+        this.handleUpdateToken = this.handleUpdateToken.bind(this)
     }
 
-    changeChild(data, func) {
-        let changedData = data;
-        // change data in here
-        if (data === null || undefined) {
-            changedData = "Empty";
-        }
-        console.log("Data Received By Parent:", changedData);
-
-        // parent storing data for him
-        // was "this.childData"
-        // this.props.childData = changedData;
-        // set data state in child via passed function
-        func(changedData);
-    };
+    handleUpdateToken(access_token) {
+        this.setState({ access_token: access_token });
+    }
 
     render() {
-        console.log("LoginForm Rendered");
         return (
             <LoginForm
                 id="Test"
+                access_token={this.state.access_token}
+
                 clientName="Plaid Client"
                 env="sandbox"
                 product={['auth', 'transactions']}
                 publicKey="7a3daf1db208b7d1fe65850572eeb1"
-                className="some-class-name"
                 apiVersion="v2"
-                updateToken={this.changeChild}
-                savedToken={this.state.savedToken}
+                onTokenUpdate={this.handleUpdateToken}
             >
             </LoginForm>
         );

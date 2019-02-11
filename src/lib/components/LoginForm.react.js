@@ -1,17 +1,15 @@
 import React, { Component } from 'react';
 import Script from 'react-load-script';
 import PropTypes from 'prop-types';
-import ReactDOM from 'react-dom';
 
-
+/**
+ * Description of LoginForm
+ */
 class LoginForm extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            // here
-            savedToken: this.props.savedToken,
-
             linkLoaded: false,
             initializeURL: 'https://cdn.plaid.com/link/v2/stable/link-initialize.js',
         };
@@ -47,52 +45,42 @@ class LoginForm extends Component {
             token: this.props.token,
             webhook: this.props.webhook,
         });
-
-        console.log("Script loaded");
+        const institution = this.props.institution || null;
+        window.linkHandler.open(institution);
     }
 
     handleLinkOnLoad() {
-        console.log("Loaded");
+        console.log("loaded");
         this.setState({ linkLoaded: true });
     }
-    // //////////////////////////////////
     handleOnSuccess(token, metadata) {
         console.log(token);
         console.log(metadata);
-        this.transmitToken(token)
+        this.props.onTokenUpdate(token);
     }
-    componentWillReceiveProps(nextProps){
-        console.log("props received");
-        this.setState({savedToken: nextProps.savedToken});
-    }
-    transmitToken(token) {
-        // get current value of token property to send to parent
-        const dataToParent = token;
-        console.log("Data Sent To Parent: ", dataToParent);
-        // data=<value-of-token-property> func=(newData) => ...
-        this.props.updateToken(dataToParent,(newToken) => {
-            this.setState({savedToken: newToken});
-        })
-    };
-    // //////////////////////////////////
-
     handleOnExit(error, metadata) {
-        console.log('link: user exited');
+        console.log('PlaidLink: user exited');
         console.log(error, metadata);
     }
     handleOnLoad() {
-        console.log('link: loaded');
+        console.log('PlaidLink: loaded');
     }
     handleOnEvent(eventname, metadata) {
-        console.log('link: user event', eventname, metadata);
+        console.log('PlaidLink: user event', eventname, metadata);
     }
 
-    renderWindow() {
-        const institution = this.props.institution || null;
-        if (window.linkHandler) {
-            window.linkHandler.open(institution);
-        }
-    }
+    // renderWindow() {
+    //     const institution = this.props.institution || null;
+    //     if (window.linkHandler) {
+    //         window.linkHandler.open(institution);
+    //     }
+    // }
+
+    // chooseRender() {
+    //     if (this.props.access_token === null) {
+    //         this.renderWindow()
+    //     }
+    // }
 
     static exit(configurationObject) {
         if (window.linkHandler) {
@@ -102,8 +90,9 @@ class LoginForm extends Component {
 
     render() {
         return (
-            <div id={this.props.id}>
-                {this.renderWindow()}
+            <div id={this.props.id}
+                 access_token={this.props.access_token}>
+                /* {this.chooseRender()} */
                 <Script
                     url={this.state.initializeURL}
                     onError={this.onScriptError}
@@ -129,30 +118,42 @@ LoginForm.defaultProps = {
 };
 
 LoginForm.propTypes = {
-    // id
+    /**
+     * id
+     */
     id: PropTypes.string,
 
-    savedToken: PropTypes.string,
-
-    // ApiVersion flag to use new version of Plaid API
+    /**
+     * ApiVersion flag to use new version of Plaid API
+     */
     apiVersion: PropTypes.string,
 
-    // Displayed once a user has successfully linked their account
+    /**
+     * Displayed once a user has successfully linked their account
+     */
     clientName: PropTypes.string.isRequired,
 
-    // The Plaid API environment on which to create user accounts.
-    // For development and testing, use tartan. For production, use production
+    /**
+     * The Plaid API environment on which to create user accounts.
+     * For development and testing, use tartan. For production, use production
+     */
     env: PropTypes.oneOf(['tartan', 'sandbox', 'development', 'production']).isRequired,
 
-    // Open link to a specific institution, for a more custom solution
+    /**
+     * Open link to a specific institution, for a more custom solution
+     */
     institution: PropTypes.string,
 
-    // The public_key associated with your account; available from
-    // the Plaid dashboard (https://dashboard.plaid.com)
+    /**
+     * The public_key associated with your account; available from
+     * the Plaid dashboard (https://dashboard.plaid.com)
+     */
     publicKey: PropTypes.string.isRequired,
 
-    // The Plaid products you wish to use, an array containing some of connect,
-    // auth, identity, income, transactions, assets
+    /**
+     * The Plaid products you wish to use, an array containing some of connect,
+     * auth, identity, income, transactions, assets
+     */
     product: PropTypes.arrayOf(
         PropTypes.oneOf([
             // legacy product names
@@ -167,43 +168,58 @@ LoginForm.propTypes = {
         ])
     ).isRequired,
 
-    // Specify an existing user's public token to launch Link in update mode.
-    // This will cause Link to open directly to the authentication step for
-    // that user's institution.
+    /**
+     * Specify an existing user's public token to launch Link in update mode.
+     * This will cause Link to open directly to the authentication step for
+     * that user's institution.
+     */
     token: PropTypes.string,
 
-    // Set to true to launch Link with the 'Select Account' pane enabled.
-    // Allows users to select an individual account once they've authenticated
+    /**
+     * This is the token that will be returned for use in Dash. Can also be
+     * understood as the "output" of this component
+     */
+    access_token: PropTypes.string,
+
+    /**
+     * Set to true to launch Link with the 'Select Account' pane enabled.
+     * Allows users to select an individual account once they've authenticated
+     */
     selectAccount: PropTypes.bool,
 
-    // Specify a webhook to associate with a user.
+    /**
+     * Specify a webhook to associate with a user.
+     */
     webhook: PropTypes.string,
 
-    // A function that is called when a user has successfully onboarded their
-    // account. The function should expect two arguments, the public_key and a
-    // metadata object
+    /**
+     * A function that is called when a user has successfully onboarded their
+     * account. The function should expect two arguments, the public_key and a
+     * metadata object
+     */
     onSuccess: PropTypes.func,
 
-    // A function that is called when a user has specifically exited Link flow
+    /**
+     * A function that is called when a user has specifically exited Link flow
+     */
     onExit: PropTypes.func,
 
-    // A function that is called when the Link module has finished loading.
-    // Calls to plaidLinkHandler.open() prior to the onLoad callback will be
-    // delayed until the module is fully loaded.
+    /**
+     * A function that is called when the Link module has finished loading.
+     * Calls to plaidLinkHandler.open() prior to the onLoad callback will be
+     * delayed until the module is fully loaded.
+     */
     onLoad: PropTypes.func,
 
-    // A function that is called during a user's flow in Link.
-    // See
+    /**
+     * A function that is called during a user's flow in Link.
+     */
     onEvent: PropTypes.func,
 
-
+    /**
+     * Function that is run when the token is updated
+     */
     onTokenUpdate: PropTypes.func,
-
-    // Button Styles as an Object
-    style: PropTypes.object,
-
-    // Button Class names as a String
-    className: PropTypes.string,
 };
 
 export default LoginForm;
