@@ -6,27 +6,28 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            access_token: null
         };
-        this.handleUpdateToken = this.handleUpdateToken.bind(this)
+
+        this.setProps = this.setProps.bind(this);
     }
 
-    handleUpdateToken(access_token) {
-        this.setState({ access_token: access_token });
+    setProps(newProps) {
+        console.log(newProps);
+        this.setState(newProps);
     }
 
     render() {
         return (
             <LoginForm
-                id="Test"
-                access_token={this.state.access_token}
+                setProps={this.setProps}
+                {...this.state}
 
-                clientName="Plaid Client"
-                env="sandbox"
-                product={['auth', 'transactions']}
-                publicKey="7a3daf1db208b7d1fe65850572eeb1"
-                apiVersion="v2"
-                onTokenUpdate={this.handleUpdateToken}
+                // id="Test"
+                // clientName="Plaid Client"
+                // env="sandbox"
+                // product={['auth', 'transactions']}
+                // publicKey="7a3daf1db208b7d1fe65850572eeb1"
+                // apiVersion="v2"
             >
             </LoginForm>
         );

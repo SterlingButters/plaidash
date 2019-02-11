@@ -22,8 +22,6 @@ class LoginForm extends Component {
         this.handleOnExit = this.handleOnExit.bind(this);
         this.handleOnEvent = this.handleOnEvent.bind(this);
         this.handleOnSuccess = this.handleOnSuccess.bind(this);
-
-        this.renderWindow = this.renderWindow.bind(this);
     }
 
     onScriptError() {
@@ -56,7 +54,8 @@ class LoginForm extends Component {
     handleOnSuccess(token, metadata) {
         console.log(token);
         console.log(metadata);
-        this.props.onTokenUpdate(token);
+
+        this.props.setProps({access_token: token})
     }
     handleOnExit(error, metadata) {
         console.log('PlaidLink: user exited');
@@ -69,19 +68,6 @@ class LoginForm extends Component {
         console.log('PlaidLink: user event', eventname, metadata);
     }
 
-    // renderWindow() {
-    //     const institution = this.props.institution || null;
-    //     if (window.linkHandler) {
-    //         window.linkHandler.open(institution);
-    //     }
-    // }
-
-    // chooseRender() {
-    //     if (this.props.access_token === null) {
-    //         this.renderWindow()
-    //     }
-    // }
-
     static exit(configurationObject) {
         if (window.linkHandler) {
             window.linkHandler.exit(configurationObject);
@@ -91,8 +77,7 @@ class LoginForm extends Component {
     render() {
         return (
             <div id={this.props.id}
-                 access_token={this.props.access_token}>
-                /* {this.chooseRender()} */
+            >
                 <Script
                     url={this.state.initializeURL}
                     onError={this.onScriptError}
@@ -108,13 +93,6 @@ LoginForm.defaultProps = {
     env: 'sandbox',
     institution: null,
     selectAccount: false,
-    style: {
-        padding: '6px 4px',
-        outline: 'none',
-        background: '#FFFFFF',
-        border: '2px solid #F1F1F1',
-        borderRadius: '4px',
-    },
 };
 
 LoginForm.propTypes = {
@@ -217,9 +195,10 @@ LoginForm.propTypes = {
     onEvent: PropTypes.func,
 
     /**
-     * Function that is run when the token is updated
+     * Dash-assigned callback that should be called whenever any of the
+     * properties change
      */
-    onTokenUpdate: PropTypes.func,
+    setProps: PropTypes.func
 };
 
 export default LoginForm;
