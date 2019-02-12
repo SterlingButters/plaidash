@@ -20,6 +20,7 @@ The purpose of this project is to create a Dash components for use with the Plai
 - Style LoginForm to custom dimensions
     
 ### Usage:
+    ```
     json
     # https://plaid.com/docs/#exchange-token-flow
     from dash.dependencies import Input, Output, State
@@ -112,7 +113,7 @@ The purpose of this project is to create a Dash components for use with the Plai
     
     if __name__ == '__main__':
         app.run_server(debug=True, dev_tools_hot_reload=False)
-
+    ```
 ##### Credentials File:
     {
       "client_id": "************************",
