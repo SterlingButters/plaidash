@@ -58,11 +58,11 @@ def display_output(clicks):
 
 @app.callback(Output('display-transactions', 'children'),
              [Input('load-button', 'n_clicks')],
-             [State('plaid-link', 'access_token')])
-def display_output(clicks, token):
+             [State('plaid-link', 'public_token')])
+def display_output(clicks, public_token):
     if clicks is not None and clicks > 0:
-        print(token)
-        response = client.Item.public_token.exchange(token)
+        print(public_token)
+        response = client.Item.public_token.exchange(public_token)
         access_token = response['access_token']
         print(access_token)
 
