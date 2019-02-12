@@ -1,5 +1,9 @@
 # Plaidash 
 The purpose of this project is to create a Dash components for use with the Plaid API
+##### What is Plaid?
+- [Plaid API](https://plaid.com/?utm_medium=cpc&utm_source=google&utm_term=plaid%20api&utm_campaign=US-Search-Brand&gclid=Cj0KCQiA14TjBRD_ARIsAOCmO9Z1PB-cu1krGvoDEy3oywUNwuufFpeqDHE9szcVJFPQ_0l7hTedfqYaAjxpEALw_wcB)
+- [Plaid for Python](https://github.com/plaid/plaid-python)
+
 #### Component List:
 - ##### LoginForm:
     Initiates the Plaid link for logging into an institution. Notable retrievable property is `public_token`; *see Usage.py*.

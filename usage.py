@@ -24,10 +24,10 @@ with open('/Users/sterlingbutters/.plaid/.credentials.json') as CREDENTIALS:
     PLAID_CLIENT_ID = KEYS['client_id']
     PLAID_PUBLIC_KEY = KEYS['public_key']
     ENV = 'sandbox'
-    if ENV == 'sandbox':
-        PLAID_SECRET = KEYS['sandbox_secret']
-    if ENV == 'dvelopment':
+    if ENV == 'development':
         PLAID_SECRET = KEYS['development_secret']
+    else:
+        PLAID_SECRET = KEYS['sandbox_secret']
     PLAID_ENV = os.getenv('PLAID_ENV', ENV)
     PLAID_PRODUCTS = os.getenv('PLAID_PRODUCTS', ['auth', 'transactions'])
 
