@@ -17,11 +17,19 @@ app.layout = html.Div([
     html.Button('Open Plaid', id='open-form-button'),
 ])
 
-PLAID_CLIENT_ID = '5c4a2ad8d8717a0010e5176c'
-PLAID_SECRET = '740664395d8cb7b64490c19a452a26'
-PLAID_PUBLIC_KEY = '7a3daf1db208b7d1fe65850572eeb1'
-PLAID_ENV = os.getenv('PLAID_ENV', 'sandbox')
-PLAID_PRODUCTS = os.getenv('PLAID_PRODUCTS', ['auth', 'transactions'])
+with open('/Users/sterlingbutters/.plaid/.credentials.json') as CREDENTIALS:
+    KEYS = json.load(CREDENTIALS)
+    print(json.dumps(KEYS, indent=2))
+
+    PLAID_CLIENT_ID = KEYS['client_id']
+    PLAID_PUBLIC_KEY = KEYS['public_key']
+    ENV = 'sandbox'
+    if ENV == 'development':
+        PLAID_SECRET = KEYS['development_secret']
+    else:
+        PLAID_SECRET = KEYS['sandbox_secret']
+    PLAID_ENV = os.getenv('PLAID_ENV', ENV)
+    PLAID_PRODUCTS = os.getenv('PLAID_PRODUCTS', ['auth', 'transactions'])
 
 client = plaid.Client(client_id=PLAID_CLIENT_ID,
                       secret=PLAID_SECRET,
@@ -50,11 +58,11 @@ def display_output(clicks):
 
 @app.callback(Output('display-transactions', 'children'),
              [Input('load-button', 'n_clicks')],
-             [State('plaid-link', 'access_token')])
-def display_output(clicks, token):
+             [State('plaid-link', 'public_token')])
+def display_output(clicks, public_token):
     if clicks is not None and clicks > 0:
-        print(token)
-        response = client.Item.public_token.exchange(token)
+        print(public_token)
+        response = client.Item.public_token.exchange(public_token)
         access_token = response['access_token']
         print(access_token)
 

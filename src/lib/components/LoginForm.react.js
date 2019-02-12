@@ -54,7 +54,7 @@ class LoginForm extends Component {
     handleOnSuccess(token, metadata) {
         console.log(token);
         console.log(metadata);
-        this.props.setProps({access_token: token})
+        this.props.setProps({public_token: token})
     }
     handleOnExit(error, metadata) {
         console.log('PlaidLink: user exited');
@@ -155,7 +155,7 @@ LoginForm.propTypes = {
      * This is the token that will be returned for use in Dash. Can also be
      * understood as the "output" of this component
      */
-    access_token: PropTypes.string,
+    public_token: PropTypes.string,
 
     /**
      * Set to true to launch Link with the 'Select Account' pane enabled.
