@@ -1,6 +1,7 @@
 # https://plaid.com/docs/#exchange-token-flow
 from dash.dependencies import Input, Output, State
 import dash_html_components as html
+import dash_core_components as dcc
 import dash
 import json
 import plaid
@@ -11,11 +12,6 @@ from flask import jsonify
 
 app = dash.Dash(__name__)
 app.config['suppress_callback_exceptions'] = True
-
-app.layout = html.Div([
-    html.Div(id='login-container'),
-    html.Button('Open Plaid', id='open-form-button'),
-])
 
 with open('/Users/sterlingbutters/.plaid/.credentials.json') as CREDENTIALS:
     KEYS = json.load(CREDENTIALS)
@@ -31,19 +27,8 @@ with open('/Users/sterlingbutters/.plaid/.credentials.json') as CREDENTIALS:
     PLAID_ENV = os.getenv('PLAID_ENV', ENV)
     PLAID_PRODUCTS = os.getenv('PLAID_PRODUCTS', ['auth', 'transactions'])
 
-client = plaid.Client(client_id=PLAID_CLIENT_ID,
-                      secret=PLAID_SECRET,
-                      public_key=PLAID_PUBLIC_KEY,
-                      environment=PLAID_ENV,
-                      api_version='2018-05-22')
-
-
-@app.callback(Output('login-container', 'children'),
-              [Input('open-form-button', 'n_clicks'),])
-def display_output(clicks):
-    if clicks is not None and clicks > 0:
-        return html.Div([
-            plaidash.LoginForm(
+app.layout = html.Div([
+    plaidash.LoginForm(
             id='plaid-link',
             clientName='Butters',
             env=PLAID_ENV,
@@ -51,17 +36,26 @@ def display_output(clicks):
             product=PLAID_PRODUCTS,
             # institution=
         ),
-            html.Button('Load Transactions', id='load-button'),
-            html.Div(id='display-transactions'),
-        ])
+    html.Button('Load Transactions', id='load-button'),
+    html.Div(id='display-transactions'),
+])
+
+client = plaid.Client(client_id=PLAID_CLIENT_ID,
+                      secret=PLAID_SECRET,
+                      public_key=PLAID_PUBLIC_KEY,
+                      environment=PLAID_ENV,
+                      api_version='2018-05-22')
 
 
 @app.callback(Output('display-transactions', 'children'),
              [Input('load-button', 'n_clicks')],
              [State('plaid-link', 'public_token')])
 def display_output(clicks, public_token):
+    stored_tokens = []
     if clicks is not None and clicks > 0:
-        print(public_token)
+        if public_token not in stored_tokens:
+            stored_tokens.append(public_token)
+        print("Stored Tokens: ", stored_tokens)
         response = client.Item.public_token.exchange(public_token)
         access_token = response['access_token']
         print(access_token)
@@ -74,9 +68,9 @@ def display_output(clicks, public_token):
             # return html.P(jsonify(format_error(e)))
             return html.P('There was an error')
 
-        print(pretty_response(transactions_response))
-        # return html.P(str(jsonify({'error': None, 'transactions': transactions_response})))
-        return html.P(pretty_response(transactions_response))
+        # print(pretty_response(transactions_response))
+        return dcc.Markdown('''```json
+        {}```'''.format(pretty_response(transactions_response)))
 
 
 def pretty_response(response):

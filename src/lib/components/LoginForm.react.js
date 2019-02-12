@@ -11,6 +11,7 @@ class LoginForm extends Component {
 
         this.state = {
             linkLoaded: false,
+            disabledButton: true,
             initializeURL: 'https://cdn.plaid.com/link/v2/stable/link-initialize.js',
         };
 
@@ -18,6 +19,7 @@ class LoginForm extends Component {
         this.onScriptLoaded = this.onScriptLoaded.bind(this);
 
         this.handleLinkOnLoad = this.handleLinkOnLoad.bind(this);
+        this.handleOnClick = this.handleOnClick.bind(this);
 
         this.handleOnExit = this.handleOnExit.bind(this);
         this.handleOnEvent = this.handleOnEvent.bind(this);
@@ -34,8 +36,8 @@ class LoginForm extends Component {
             clientName: this.props.clientName,
             env: this.props.env,
             key: this.props.publicKey,
-            onExit: this.handleOnExit,
             onLoad: this.handleLinkOnLoad,
+            onExit: this.handleOnExit,
             onEvent: this.handleOnEvent,
             onSuccess: this.handleOnSuccess,
             product: this.props.product,
@@ -43,25 +45,25 @@ class LoginForm extends Component {
             token: this.props.token,
             webhook: this.props.webhook,
         });
-        const institution = this.props.institution || null;
-        window.linkHandler.open(institution);
+        this.setState({ disabledButton: false });
     }
 
     handleLinkOnLoad() {
         console.log("loaded");
         this.setState({ linkLoaded: true });
     }
+    handleOnClick() {
+        const institution = this.props.institution || null;
+        window.linkHandler.open(institution);
+    }
     handleOnSuccess(token, metadata) {
         console.log(token);
         console.log(metadata);
-        this.props.setProps({public_token: token})
+        this.props.setProps({public_token: token});
     }
     handleOnExit(error, metadata) {
         console.log('PlaidLink: user exited');
         console.log(error, metadata);
-    }
-    handleOnLoad() {
-        console.log('PlaidLink: loaded');
     }
     handleOnEvent(eventname, metadata) {
         console.log('PlaidLink: user event', eventname, metadata);
@@ -75,8 +77,13 @@ class LoginForm extends Component {
 
     render() {
         return (
-            <div id={this.props.id}
-            >
+            <div id={this.props.id}>
+                <button
+                    onClick={this.handleOnClick}
+                    disabled={this.state.disabledButton}>
+                    Click to Open PLaid Link
+                </button>
+
                 <Script
                     url={this.state.initializeURL}
                     onError={this.onScriptError}
