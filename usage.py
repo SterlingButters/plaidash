@@ -12,7 +12,8 @@ import plaidash
 import datetime
 from flask import jsonify
 
-app = dash.Dash(__name__)
+stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=stylesheet)
 app.config['suppress_callback_exceptions'] = True
 
 with open('/Users/sterlingbutters/.plaid/.credentials.json') as CREDENTIALS:
@@ -29,9 +30,18 @@ with open('/Users/sterlingbutters/.plaid/.credentials.json') as CREDENTIALS:
     PLAID_ENV = os.getenv('PLAID_ENV', ENV)
     PLAID_PRODUCTS = os.getenv('PLAID_PRODUCTS', ['auth', 'transactions'])
 
+
+def pretty_response(response):
+    return json.dumps(response, indent=2, sort_keys=True)
+
+
+def format_error(e):
+    return {'error': {'display_message': e.display_message, 'error_code': e.code, 'error_type': e.type,}} # 'error_message': e.message } }
+
+
 app.layout = html.Div([
     # Will lose the data when browser/tab closes.
-    dcc.Store(id='public-tokens', storage_type='session'),
+    dcc.Store(id='public-tokens', storage_type='session', data={'tokens': []}),
     html.Button('Store current token', id='store-button'),
     html.Div(id='display-tokens'),
 
@@ -43,8 +53,7 @@ app.layout = html.Div([
             product=PLAID_PRODUCTS,
             # institution=
         ),
-    html.Button('Load Transactions', id='load-button'),
-    html.Div(id='display-transactions'),
+    html.Div(id='transaction-table'),
 ])
 
 client = plaid.Client(client_id=PLAID_CLIENT_ID,
@@ -55,68 +64,100 @@ client = plaid.Client(client_id=PLAID_CLIENT_ID,
 
 
 ##################################################################
+# Commit to Memory
 @app.callback(Output('public-tokens', 'data'),
               [Input('store-button', 'n_clicks')],
               [State('plaid-link', 'public_token'),
-               State('public-tokens', 'data'),])
+               State('public-tokens', 'data')])
 def on_click(clicks, public_token, data):
     if clicks is None:
-        # Preventing the None callbacks is important with the store component,
-        # you don't want to update the store for nothing.
         raise PreventUpdate
 
-    if data is None:
-        data = {'tokens': []}
-    else:
-        stored_tokens = data['tokens'] or []
-        stored_tokens.append(public_token)
-        data = {'tokens': stored_tokens}
+    stored_tokens = data['tokens'] or []
+    stored_tokens.append(public_token)
+    data = {'tokens': stored_tokens}
+
     return data
 
+##################################################################
 
-# output the stored clicks in the table cell.
-@app.callback(Output('display-tokens', 'children'),
+
+# Display from Memory
+@app.callback(Output('transaction-table', 'children'),
               [Input('public-tokens', 'modified_timestamp')],
               [State('public-tokens', 'data')])
-def on_data(ts, data):
-    if ts is None:
+def display_output(timestamp, data):
+    if timestamp is None:
         raise PreventUpdate
 
     data = data or {}
     STORED_TOKENS = data.get('tokens')
-    print(STORED_TOKENS)
-    return dcc.Markdown('''```{}```'''.format(pd.Series(STORED_TOKENS)))
-##################################################################
 
+    if len(STORED_TOKENS) >= 1:
+        if STORED_TOKENS[-1] is not None:
+            public_token = STORED_TOKENS[-1]
+            response = client.Item.public_token.exchange(public_token)
+            access_token = response['access_token']
+            print("Public Token '{}' was exchanged for Access Token '{}'".format(public_token, access_token))
 
-@app.callback(Output('display-transactions', 'children'),
-              [Input('load-button', 'n_clicks')],
-              [State('plaid-link', 'public_token')])
-def display_output(clicks, public_token):
-    if clicks is not None and clicks > 0:
-        response = client.Item.public_token.exchange(public_token)
-        access_token = response['access_token']
-        print("Public Token {} was exchanged for Access Token {}".format(public_token, access_token))
+            start_date = '{:%Y-%m-%d}'.format(datetime.datetime.now() + datetime.timedelta(-30))
+            end_date = '{:%Y-%m-%d}'.format(datetime.datetime.now())
+            try:
+                transactions_response = client.Transactions.get(access_token=access_token, start_date=start_date,
+                                                                end_date=end_date)
 
-        start_date = '{:%Y-%m-%d}'.format(datetime.datetime.now() + datetime.timedelta(-30))
-        end_date = '{:%Y-%m-%d}'.format(datetime.datetime.now())
-        try:
-            transactions_response = client.Transactions.get(access_token=access_token, start_date=start_date, end_date=end_date)
-        except plaid.errors.PlaidError as e:
-            # return html.P(jsonify(format_error(e)))
-            return html.P('There was an error')
+            except plaid.errors.PlaidError as e:
+                # return html.P(jsonify(format_error(e)))
+                return html.P('There was an error')
 
-        # print(pretty_response(transactions_response))
-        return dcc.Markdown('''```json
-        {}```'''.format(pretty_response(transactions_response)))
+            transactions = transactions_response.get('transactions')
 
+            names = [transaction['name'] for transaction in transactions]
+            categories = [transaction['category'] for transaction in transactions]
+            locations = [transaction['location'] for transaction in transactions]
+            statuses = [transaction['pending'] for transaction in transactions]
+            amounts = [transaction['amount'] for transaction in transactions]
+            # Payment Method: payment_meta
+            dates = [transaction['date'] for transaction in transactions]
+            id = [transaction['transaction_id'] for transaction in transactions]
 
-def pretty_response(response):
-    return json.dumps(response, indent=2, sort_keys=True)
+            TOKEN_MEAT = []
+            for a in range(len(STORED_TOKENS)):
+                if a is not None:
+                    TOKEN_MEAT.append(html.Tr([html.Td(STORED_TOKENS[a]), '']))
 
+            INFO_MEAT = []
+            for b in range(len(transactions)):
+                INFO_MEAT.append(html.Tr([html.Td(names[b]), html.Td(amounts[b]), html.Td(dates[b])]))
 
-def format_error(e):
-    return {'error': {'display_message': e.display_message, 'error_code': e.code, 'error_type': e.type,}} # 'error_message': e.message } }
+            return html.Div([
+                            html.Table([
+                                html.Thead([
+                                    html.Tr([
+                                        html.Th('Stored Public Tokens'),
+                                    ]),
+                                    html.Tbody([
+                                        *TOKEN_MEAT,
+                                        ])
+                                    ]),
+
+                            html.Table([
+                                html.Thead([
+                                    html.Tr([
+                                        html.Th('Name'),
+                                        html.Th('Amount'),
+                                        html.Th('Date')
+                                        ])
+                                    ]),
+                                    html.Tbody([
+                                        *INFO_MEAT,
+                                        ])
+                                    ])
+                            ])
+            ])
+
+        else:
+            return "Navigate Plaid Link to Obtain Token"
 
 
 if __name__ == '__main__':
