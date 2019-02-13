@@ -1,10 +1,12 @@
 # https://plaid.com/docs/#exchange-token-flow
 from dash.dependencies import Input, Output, State
+from dash.exceptions import PreventUpdate
 import dash_html_components as html
 import dash_core_components as dcc
 import dash
 import json
 import plaid
+import pandas as pd
 import os
 import plaidash
 import datetime
@@ -28,6 +30,11 @@ with open('/Users/sterlingbutters/.plaid/.credentials.json') as CREDENTIALS:
     PLAID_PRODUCTS = os.getenv('PLAID_PRODUCTS', ['auth', 'transactions'])
 
 app.layout = html.Div([
+    # Will lose the data when browser/tab closes.
+    dcc.Store(id='public-tokens', storage_type='session'),
+    html.Button('Store current token', id='store-button'),
+    html.Div(id='display-tokens'),
+
     plaidash.LoginForm(
             id='plaid-link',
             clientName='Butters',
@@ -47,18 +54,49 @@ client = plaid.Client(client_id=PLAID_CLIENT_ID,
                       api_version='2018-05-22')
 
 
+##################################################################
+@app.callback(Output('public-tokens', 'data'),
+              [Input('store-button', 'n_clicks')],
+              [State('plaid-link', 'public_token'),
+               State('public-tokens', 'data'),])
+def on_click(clicks, public_token, data):
+    if clicks is None:
+        # Preventing the None callbacks is important with the store component,
+        # you don't want to update the store for nothing.
+        raise PreventUpdate
+
+    if data is None:
+        data = {'tokens': []}
+    else:
+        stored_tokens = data['tokens'] or []
+        stored_tokens.append(public_token)
+        data = {'tokens': stored_tokens}
+    return data
+
+
+# output the stored clicks in the table cell.
+@app.callback(Output('display-tokens', 'children'),
+              [Input('public-tokens', 'modified_timestamp')],
+              [State('public-tokens', 'data')])
+def on_data(ts, data):
+    if ts is None:
+        raise PreventUpdate
+
+    data = data or {}
+    STORED_TOKENS = data.get('tokens')
+    print(STORED_TOKENS)
+    return dcc.Markdown('''```{}```'''.format(pd.Series(STORED_TOKENS)))
+##################################################################
+
+
 @app.callback(Output('display-transactions', 'children'),
-             [Input('load-button', 'n_clicks')],
-             [State('plaid-link', 'public_token')])
+              [Input('load-button', 'n_clicks')],
+              [State('plaid-link', 'public_token')])
 def display_output(clicks, public_token):
-    stored_tokens = []
     if clicks is not None and clicks > 0:
-        if public_token not in stored_tokens:
-            stored_tokens.append(public_token)
-        print("Stored Tokens: ", stored_tokens)
         response = client.Item.public_token.exchange(public_token)
         access_token = response['access_token']
-        print(access_token)
+        print("Public Token {} was exchanged for Access Token {}".format(public_token, access_token))
 
         start_date = '{:%Y-%m-%d}'.format(datetime.datetime.now() + datetime.timedelta(-30))
         end_date = '{:%Y-%m-%d}'.format(datetime.datetime.now())
